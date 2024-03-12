@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <script type="text/javascript">
+         // Declaración de variables globales
+         var sock = null; // Variable para el socket WebSocket
+         var ellog = null; // Variable para el elemento de registro (log)
+
+         // Función que se ejecuta cuando la ventana ha cargado completamente
+         window.onload = function() {
+            // Se obtiene el elemento de registro por su id
+            debugger;
+            ellog = document.getElementById('log');
+
+            // Se determina la URI del WebSocket dependiendo del protocolo utilizado
+            var wsuri;
+            if (window.location.protocol === "file:") {
+               wsuri = "ws://127.0.0.1:9090/ws"; // Si es file protocol
+            } else {
+               wsuri = "ws://" + window.location.hostname + ":9090/ws"; // Si es otro protocolo
+            }
+
+            // Se verifica si el navegador soporta WebSocket
+            if ("WebSocket" in window) {
+               sock = new WebSocket(wsuri); // Se crea un WebSocket
+            } else if ("MozWebSocket" in window) {
+               sock = new MozWebSocket(wsuri); // En caso de un navegador Mozilla
+            } else {
+               log("¡El navegador no soporta WebSocket!"); // Mensaje de error si no se soporta WebSocket
+            }
+
+            // Si el socket está disponible
+            if (sock) {
+               // Se ejecuta cuando la conexión se abre
+               sock.onopen = function() {
+                  log("Conectado a " + wsuri); // Se muestra un mensaje de conexión exitosa
+               }
+
+               // Se ejecuta cuando la conexión se cierra
+               sock.onclose = function(e) {
+                  log("Conexión cerrada (wasClean = " + e.wasClean + ", código = " + e.code + ", razón = '" + e.reason + "')"); // Se muestra un mensaje de conexión cerrada
+                  sock = null; // Se limpia la variable del socket
+               }
+
+               // Se ejecuta cuando se recibe un mensaje del servidor
+               sock.onmessage = function(e) {
+                  log("Mensaje recibido: " + e.data); // Se muestra un mensaje con el contenido del mensaje recibido
+               }
+            }
+         };
+
+         // Función para enviar un mensaje al servidor
+         function send() {
+            var msg = document.getElementById('message').value; // Se obtiene el valor del mensaje del input
+            if (sock) {
+               sock.send(msg); // Se envía el mensaje al servidor
+               log("Enviado: " + msg); // Se muestra un mensaje indicando que el mensaje fue enviado
+            } else {
+               log("No conectado."); // Se muestra un mensaje indicando que no hay conexión
+            }
+         };
+
+         // Función para registrar mensajes en el área de log
+         function log(m) {
+            ellog.innerHTML += m + '\n'; // Se agrega el mensaje al elemento de log
+            ellog.scrollTop = ellog.scrollHeight; // Se hace scroll hasta el final del área de log
+         };
+      </script>
+   </head>
+   <body>
+      <h1>Prueba de Eco de Autobahn WebSocket</h1>
+      <noscript>Debes habilitar JavaScript</noscript>
+      <form>
+         <p>Mensaje: <input id="message" type="text" size="50" maxlength="50" value="¡Hola, mundo!"></p>
+      </form>
+      <button onclick='send();'>Enviar Mensaje</button>
+      <pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
+   </body>
+</html>
