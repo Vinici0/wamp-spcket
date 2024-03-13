@@ -17,3 +17,6 @@ and open
 in your browser.
 
 This will show up all WebSocket messages exchanged between clients and server.
+
+Link:
+https://github.com/crossbario/autobahn-python/blob/master/docs/websocket/programming.rst
