@@ -33,3 +33,48 @@ Aquí hay un resumen del flujo de autenticación:
 Después de este proceso de autenticación, el cliente puede ejecutar otros comandos en el servidor, como obtener el saldo, obtener la versión de los datos, obtener textos de ayuda, etc.
 
 Esencialmente, el cliente establece una conexión WebSocket con el servidor, realiza el proceso de autenticación y luego puede interactuar con el servidor enviando y recibiendo mensajes según sea necesario.
+
+## Login
+```
+class SimpleClientProtocol(WampClientProtocol):
+    def show(self, result):
+        print("SUCCESS:" + result)
+
+    def logerror(self, e):
+        erroruri, errodesc, errordetails = e.value.args
+        print("ERROR: %s ('%s') - %s" % (erroruri, errodesc, errordetails))
+
+    def done(self, *args):
+        self.sendClose()
+
+    def onSessionOpen(self):
+        def handle_payload(payload):
+            print("Received payload:", payload)
+
+        def handle_error(error):
+            print("Error receiving payload:", error)
+
+        def handle_event(topic, event):
+            print("Received event from topic {}: {}".format(topic, event))
+
+        # Suscribirse a un tema para recibir eventos del servidor
+        self.subscribe(handle_event, 'some_topic')
+
+        # Generar un nonce
+        d1 = self.call("GenerateNonce", "888")
+
+        def handle_nonce(nonce):
+            # Calcular hmac, etc.
+            # Luego, realizar el Signup
+            d2 = self.call("Signup", "888", "hashed_password", "Samsung SM-G570F")
+            d2.addCallbacks(signup_success, signup_failure)
+
+        d1.addCallback(handle_nonce)
+
+        DeferredList([d1]).addCallback(self.done)
+
+    def onMessage(self, msg, binary):
+        super().onMessage(msg, binary)
+        # Este método se llama cada vez que se recibe un mensaje del servidor
+        # Puedes procesar los mensajes aquí según sea necesario
+```
