@@ -11,12 +11,9 @@ app = Klein()
 
 class SimpleClientProtocol(WampClientProtocol):
     array_events = []
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.nonce = None
-        self.args = args
-        self.kwargs = kwargs
-        super().__init__()
+
 
     def show(self, result):
         print("SUCCESS:" + result)
@@ -44,19 +41,14 @@ class SimpleClientProtocol(WampClientProtocol):
 def saludo(request):
     return 'Hola!'
 
-@app.route('/example', methods=['GET'])  # Definimos los parámetros de la URL
-def example_route(request):  # Recibimos los parámetros en la función de la ruta
-    arg1 = "arg1"
-    arg2 = "arg2"
+@app.route('/example', methods=['GET'])
+def example_route(request):
     factory = WampClientFactory("ws://192.168.3.144:3081", debugWamp=True)
-    factory.protocol = SimpleClientProtocol(arg1, arg2)
+    factory.protocol = SimpleClientProtocol
     connectWS(factory)
     return {
-        "arg1": arg1,
-        "arg2": arg2,
         "ok": True,
     }
-
 
 @app.route('/get_data_version', methods=['POST'])
 def get_data_version(request):
