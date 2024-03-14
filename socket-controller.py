@@ -11,9 +11,9 @@ app = Klein()
 
 class SimpleClientProtocol(WampClientProtocol):
     array_events = []
-    def __init__(self):
-        self.nonce = None
-
+    def __init__(self, nonce_value):
+            self.nonce = None
+            self.nonce_value = nonce_value
 
     def show(self, result):
         print("SUCCESS:" + result)
@@ -26,7 +26,7 @@ class SimpleClientProtocol(WampClientProtocol):
         self.sendClose()
 
     def onSessionOpen(self):
-        d1 = self.call("GenerateNonce", "888").addCallback(self.process_nonce).addErrback(self.logerror)
+        d1 = self.call("GenerateNonce", self.nonce_value).addCallback(self.process_nonce).addErrback(self.logerror)
         self.array_events.append(d1)
 
     def process_nonce(self, result):
@@ -34,29 +34,14 @@ class SimpleClientProtocol(WampClientProtocol):
         if self.nonce is not None:
             d2 = self.call("GetDataVersion").addCallback(self.show)
             self.array_events.append(d2)
-            # d3 = self.call("GetHelpText").addCallback(self.show)
             DeferredList(self.array_events).addCallback(self.done)
 
-@app.route('/saludo', methods=['GET'])
-def saludo(request):
-    return 'Hola!'
-
-@app.route('/example', methods=['GET'])
-def example_route(request):
+@app.route('/example/<nonce_value>', methods=['GET'])
+def example_route(request, nonce_value):
     factory = WampClientFactory("ws://192.168.3.144:3081", debugWamp=True)
-    factory.protocol = SimpleClientProtocol
+    factory.protocol = lambda: SimpleClientProtocol(nonce_value)
     connectWS(factory)
-    return {
-        "ok": True,
-    }
-
-@app.route('/get_data_version', methods=['POST'])
-def get_data_version(request):
-    data = request.content.read().decode('utf-8')
-    data = json.loads(data)
-    name = data['name']
-    print(f"Name: {name}")
-    return f"Name: {name}"
+    return "OK"
 
 if __name__ == '__main__':
     log.startLogging(sys.stdout)
