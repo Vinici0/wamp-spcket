@@ -44,56 +44,6 @@ Example:
         }
 ```
 
-```
-class MessageHandler:
-    @staticmethod
-    def handle_message(protocol, payload):
-        print("Received message:", payload)
-        if payload == "GenerateNonce":
-            protocol.call("GenerateNonce").addCallback(protocol.show)
-        elif payload == "GetBalance":
-            protocol.call("GetBalance").addCallback(protocol.show)
-        elif payload == "GetDataVersion":
-            protocol.call("GetDataVersion").addCallback(protocol.show)
-        elif payload == "GetHelpText":
-            protocol.call("GetHelpText").addCallback(protocol.show)
-        elif payload == "GetImageText":
-            protocol.call("GetImageText").addCallback(protocol.show)
-        elif payload == "GetPanelState":
-            protocol.call("GetPanelState", "panel_id", 1).addCallback(protocol.show)
-        elif payload == "GetPanelGroups":
-            protocol.call("GetPanelGroups").addCallback(protocol.show)
-        elif payload == "GetEvents":
-            protocol.call("GetEvents", "panel_id", 1, 0, 0, 1, False).addCallback(protocol.show)
-        elif payload == "GetCurrentSubscriptions":
-            protocol.call("GetCurrentSubscriptions", "panel_id", 1).addCallback(protocol.show)
-        elif payload == "ChangePassword":
-            protocol.call("ChangePassword", "login", "new_pass", "device_name").addCallback(protocol.show)
-        elif payload == "SelectPanelEventsForNotify":
-            protocol.call("SelectPanelEventsForNotify", "panel_id", 1, "1,2,3,4,7,8,9,14,...").addCallback(protocol.show)
-        elif payload == "PushRegistration":
-            protocol.call("PushRegistration", 0, "registration_id", "platform").addCallback(protocol.show)
-        elif payload == "RemoteControl":
-            protocol.call("RemoteControl", 10, "panel_id", 1, 0).addCallback(protocol.show)
-        elif payload == "TechniqueOnPanel":
-            protocol.call("TechniqueOnPanel", "panel_id", 20).addCallback(protocol.show)
-        elif payload == "TechniqueLeftPanel":
-            protocol.call("TechniqueLeftPanel", "panel_id").addCallback(protocol.show)
-        elif payload == "ClearUserNotifications":
-            protocol.call("ClearUserNotifications").addCallback(protocol.show)
-        elif payload == "SetUserPreferences":
-            protocol.call("SetUserPreferences", "notification_sound_file_name", 1).addCallback(protocol.show)
-        elif payload == "CheckAlarmBtn":
-            protocol.call("CheckAlarmBtn", "panel_id", 1, 31).addCallback(protocol.show)
-        else:
-            print("Unknown action:", payload)
-    
-    @staticmethod
-    def saludo():
-        print("Confirmando")
-
-```
-
 Servidor
 ```
     def onMessage(self, payload, isBinary):
